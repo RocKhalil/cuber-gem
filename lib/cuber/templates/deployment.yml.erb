@@ -316,6 +316,33 @@ spec:
       targetPort: 8080
 
 ---
+<%- if @options[:is_gke] %>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+  namespace: <%= @options[:app] %>
+  labels:
+    app.kubernetes.io/name: <%= @options[:app].to_s.to_json %>
+    app.kubernetes.io/instance: <%= @options[:instance].to_s.to_json %>
+    app.kubernetes.io/version: <%= @options[:release].to_s.to_json %>
+    app.kubernetes.io/managed-by: cuber
+  annotations:
+    cert-manager.io/issuer: "letsencrypt-production"
+    <%- @options[:lb].each do |key, value| -%>
+    <%= key %>: <%= value.to_s.to_json %>
+    <%- end -%>
+spec:
+  tls:
+    - hosts:
+        - <%= @options[:host] %>
+      secretName: letencrypt-ssl
+  defaultBackend:
+    service:
+      name: web-service
+      port:
+        number: 80
+<%- else -%>
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -345,6 +372,7 @@ spec:
             name: web-service
             port:
               number: 80
+<%- end -%>
 <%- else -%>
 ---
 apiVersion: v1

@@ -23,7 +23,10 @@ module Cuber
       validate_health
       validate_lb
       validate_ingress
+      validate_gke
+      validate_host
       validate_ssl
+      validate_certbot_email
       @errors
     end
 
@@ -119,6 +122,21 @@ module Cuber
     def validate_ingress
       return unless @options[:ingress]
       @errors << 'ingress must be true or false' if @options[:ingress] != true && @options[:ingress] != false
+    end
+
+    def validate_gke
+      return unless @options[:is_gke]
+      @errors << 'is_gke must be true or false' if @options[:is_gke] != true && @options[:is_gke] != false
+    end
+
+    def validate_host
+      return unless @options[:host]
+      @errors << 'Host must be present' if @options[:host].to_s.strip.empty?
+    end
+
+    def validate_certbot_email
+      return unless @options[:certbot_email] || @options[:is_gke]
+      @errors << 'certbot_email must be present when using is_gke' if @options[:certbot_email].to_s.strip.empty?
     end
 
     def validate_ssl

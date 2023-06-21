@@ -19,6 +19,9 @@ module Cuber
       @lb = {}
       @ingress = nil
       @ssl = nil
+      @is_gke = false
+      @certbot_email = nil
+      @host = nil
     end
 
     def method_missing m, *args
@@ -87,6 +90,18 @@ module Cuber
 
     def ingress enabled
       @ingress = enabled
+    end
+
+    def is_gke enabled
+      @is_gke = enabled
+    end
+
+    def host name
+      @host = name
+    end
+
+    def certbot_email name
+      @certbot_email = name
     end
 
     def ssl crt, key
