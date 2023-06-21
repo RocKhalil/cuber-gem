@@ -92,14 +92,14 @@ module Cuber::Commands
     def apply
       print_step 'Applying configuration to Kubernetes cluster'
 
+      kubectl 'apply',
+        '-f', '.cuber/kubernetes/deployment.yml',
+        '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"
+
       if @options[:is_gke]
         kubectl 'apply', '-f', '.cuber/kubernetes/lets-encrypt-secret.yml'
         kubectl 'apply', '-f', '.cuber/kubernetes/lets-encrypt-issuer.yml'
       end
-
-      kubectl 'apply',
-        '-f', '.cuber/kubernetes/deployment.yml',
-        '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"
     end
 
     def rollout
