@@ -80,11 +80,23 @@ module Cuber::Commands
       print_step 'Generating Kubernetes configuration'
       @options[:instance] = "#{@options[:app]}-#{Time.now.utc.iso8601.delete('^0-9')}"
       @options[:dockerconfigjson] = Base64.strict_encode64 File.read File.expand_path(@options[:dockerconfig] || '~/.docker/config.json')
+
+      if @options[:is_gke]
+        render 'lets-encrypt-secret.yml', '.cuber/kubernetes/lets-encrypt-secret.yml'
+        render 'lets-encrypt-issuer.yml', '.cuber/kubernetes/lets-encrypt-issuer.yml'
+      end
+
       render 'deployment.yml', '.cuber/kubernetes/deployment.yml'
     end
 
     def apply
       print_step 'Applying configuration to Kubernetes cluster'
+
+      if @options[:is_gke]
+        kubectl 'apply', '-f', '.cuber/kubernetes/lets-encrypt-secret.yml'
+        kubectl 'apply', '-f', '.cuber/kubernetes/lets-encrypt-issuer.yml'
+      end
+
       kubectl 'apply',
         '-f', '.cuber/kubernetes/deployment.yml',
         '--prune', '-l', "app.kubernetes.io/name=#{@options[:app]},app.kubernetes.io/managed-by=cuber"
