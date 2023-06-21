@@ -1,3 +1,3 @@
 module Cuber
-  VERSION = '1.10.17'.freeze
+  VERSION = '1.11.0'.freeze
 end
